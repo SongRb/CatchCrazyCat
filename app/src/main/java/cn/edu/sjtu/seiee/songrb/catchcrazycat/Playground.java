@@ -4,9 +4,9 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
-import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.RectF;
+import android.support.v4.content.ContextCompat;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
@@ -29,8 +29,9 @@ public class Playground extends SurfaceView implements View.OnTouchListener {
     private static int WIDTH = 40;
     int startingX = 0;
     int startingY = 40;
-
-
+    private int colorBackground;
+    private int colorWallDot;
+    private int colorEmptyDot;
     private Dot matrix[][];
     private Dot cat;
 
@@ -56,7 +57,7 @@ public class Playground extends SurfaceView implements View.OnTouchListener {
             // TODO Auto-generated method stub
             WIDTH = arg2 / (COL + 1);
             startingY = arg3 - (ROW + 1) * WIDTH;
-            startingX = (arg2 - (ROW) * WIDTH) / 2;
+            startingX = (int) ((arg2 - ((double) ROW + 0.5) * WIDTH) / 2);
             redraw();
         }
     };
@@ -68,6 +69,11 @@ public class Playground extends SurfaceView implements View.OnTouchListener {
 
         icon = Bitmap.createScaledBitmap(BitmapFactory.decodeResource(getResources(),
                 R.drawable.cat), (int) 3.8 * WIDTH, (int) 3.8 * WIDTH, false);
+
+        colorBackground = ContextCompat.getColor(this.getContext(), R.color.colorBackground);
+        colorEmptyDot = ContextCompat.getColor(this.getContext(), R.color.colorEmptyDot);
+        colorWallDot = ContextCompat.getColor(this.getContext(), R.color.colorWallDot);
+
 
         getHolder().addCallback(callback);
         matrix = new Dot[ROW][COL];
@@ -224,12 +230,12 @@ public class Playground extends SurfaceView implements View.OnTouchListener {
 
     private void win() {
         Toast.makeText(getContext(), "You Win!", Toast.LENGTH_SHORT).show();
-
+        initGame();
     }
 
     private void redraw() {
         Canvas c = getHolder().lockCanvas();
-        c.drawColor(Color.LTGRAY);
+        c.drawColor(colorBackground);
         Paint paint = new Paint();
         paint.setFlags(Paint.ANTI_ALIAS_FLAG);
         for (int i = 0; i < ROW; i++) {
@@ -241,10 +247,10 @@ public class Playground extends SurfaceView implements View.OnTouchListener {
                 Dot one = getDot(j, i);
                 switch (one.getStatus()) {
                     case Dot.STATUS_OFF:
-                        paint.setColor(0xFFEEEEEE);
+                        paint.setColor(colorEmptyDot);
                         break;
                     case Dot.STATUS_ON:
-                        paint.setColor(0xFFFFAA00);
+                        paint.setColor(colorWallDot);
                         break;
                     case Dot.STATUS_IN:
                         paint.setColor(0xFFFF0000);
